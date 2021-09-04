@@ -2,17 +2,16 @@ import asyncio
 from pydantic import HttpUrl
 
 from src.client.aiohttp_client import HTTPClient
-from src.models.chain_models import RestChainsListModel
+from src.models.chain_models import ChainsListModel
 
 
 class DgSDK:
     def __init__(self, api_key: str, endpoint: HttpUrl):
         self.client = HTTPClient(headers={'Authorization': f'Bearer {api_key}'}, url_prefix=endpoint)
 
-    async def get_chains(self) -> RestChainsListModel:
+    async def get_chains(self) -> ChainsListModel:
         response: dict = await self.client.get('v1/chain/')
-        print(response)
-        return RestChainsListModel.parse_obj(response)
+        return ChainsListModel.parse_obj(response)
 
 
 sdk = DgSDK(api_key='5UOakVpK8YTQHdOS_R8nInB84kk1ZwJzsAlufhp1t0M',

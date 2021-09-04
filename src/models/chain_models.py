@@ -3,18 +3,18 @@ from typing import List
 from pydantic import BaseModel
 
 
-class RestChainModel(BaseModel):
+class ChainModel(BaseModel):
     chain_id: int
     name: str
     description: str
     last_block_number: int
 
 
-class RestChainsListModel(BaseModel):
+class ChainsListModel(BaseModel):
     total: int
-    data: List[RestChainModel]
+    data: List[ChainModel]
 
     @classmethod
-    def from_response(cls, chains: List[dict]) -> 'RestChainsListModel':
-        data = [RestChainModel.parse_obj(chain) for chain in chains]
+    def from_response(cls, chains: List[dict]) -> 'ChainsListModel':
+        data = [ChainModel.parse_obj(chain) for chain in chains]
         return cls(data=data, total=len(data))
