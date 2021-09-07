@@ -1,1 +1,1 @@
-from .dg_sdk import DgSDK
+from .dg_sdk import DexGuru

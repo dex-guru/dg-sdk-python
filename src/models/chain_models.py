@@ -15,6 +15,6 @@ class ChainsListModel(BaseModel):
     data: List[ChainModel]
 
     @classmethod
-    def from_response(cls, chains: List[dict]) -> 'ChainsListModel':
+    def from_response(cls, chains: dict) -> 'ChainsListModel':
         data = [ChainModel.parse_obj(chain) for chain in chains]
         return cls(data=data, total=len(data))

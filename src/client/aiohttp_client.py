@@ -35,15 +35,15 @@ class HTTPClient:
         # TODO add some health_check and/or auth_check
 
     async def get(self, url: str, retry_sleep: Optional[int] = None) -> Union[dict, None]:
-        url = self.url_prefix + url
+        url = self.url_prefix + '/v1/chain' + url
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=self.timeout,
-                                         raise_for_status=True) \
-                as session:
+                                         raise_for_status=False) as session:
             try:
                 logging.debug(f"Fetching {url}")
 
                 async with session.get(url, headers=self.headers, ssl=ssl.SSLContext(),
-                                       raise_for_status=True) as response:
+                                       raise_for_status=False) as response:
+                    # TODO exc details
                     await asyncio.sleep(0.01)
                     response_text = await response.text()
                     logging.debug(f"Fetched {url}")
