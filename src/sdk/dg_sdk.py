@@ -91,8 +91,7 @@ class DexGuru:
     ) -> models.TokensInventoryListModel:
         query = get_query_from_params(**locals())
         response: dict = await self.client.get(f'/{chain_id}/tokens/?{query}')
-        if not response:
-            return []
+
         return models.TokensInventoryListModel.parse_obj(response)
 
 
