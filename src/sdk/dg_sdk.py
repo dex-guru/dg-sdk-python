@@ -214,10 +214,70 @@ class DexGuru:
     async def get_wallet_info(
             self,
             chain_id: int,
-            wallet_address: str  # todo _addresses
+            wallet_address: str
     ) -> models.WalletModel:
         response: dict = await self.client.get(f'/{chain_id}/wallets/{wallet_address}')
         return models.WalletModel.parse_obj(response)
+
+    async def get_wallet_transactions(
+            self,
+            chain_id: int,
+            wallet_address: str,
+            amm_id: AmmChoices = None,
+            sort_by: SortChoices = SortChoices.timestamp.value,
+            limit: conint(gt=0, le=100) = 10,
+            offset: conint(ge=0) = 0,
+            begin_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = START_BLOCK_TIMESTAMP,
+            end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
+    ) -> models.SwapsBurnsMintsListModel:
+        query = get_query_from_params(**locals())
+        response: dict = await self.client.get(f'/{chain_id}/wallets/{wallet_address}/transactions/?{query}')
+        return models.SwapsBurnsMintsListModel.parse_obj(response)
+
+    async def get_wallet_swaps(
+            self,
+            chain_id: int,
+            wallet_address: str,
+            amm_id: AmmChoices = None,
+            sort_by: SortChoices = SortChoices.timestamp.value,
+            limit: conint(gt=0, le=100) = 10,
+            offset: conint(ge=0) = 0,
+            begin_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = START_BLOCK_TIMESTAMP,
+            end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
+    ) -> models.SwapsBurnsMintsListModel:
+        query = get_query_from_params(**locals())
+        response: dict = await self.client.get(f'/{chain_id}/wallets/{wallet_address}/transactions/swaps/?{query}')
+        return models.SwapsBurnsMintsListModel.parse_obj(response)
+
+    async def get_wallet_burns(
+            self,
+            chain_id: int,
+            wallet_address: str,
+            amm_id: AmmChoices = None,
+            sort_by: SortChoices = SortChoices.timestamp.value,
+            limit: conint(gt=0, le=100) = 10,
+            offset: conint(ge=0) = 0,
+            begin_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = START_BLOCK_TIMESTAMP,
+            end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
+    ) -> models.SwapsBurnsMintsListModel:
+        query = get_query_from_params(**locals())
+        response: dict = await self.client.get(f'/{chain_id}/wallets/{wallet_address}/transactions/burns/?{query}')
+        return models.SwapsBurnsMintsListModel.parse_obj(response)
+
+    async def get_wallet_mints(
+            self,
+            chain_id: int,
+            wallet_address: str,
+            amm_id: AmmChoices = None,
+            sort_by: SortChoices = SortChoices.timestamp.value,
+            limit: conint(gt=0, le=100) = 10,
+            offset: conint(ge=0) = 0,
+            begin_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = START_BLOCK_TIMESTAMP,
+            end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
+    ) -> models.SwapsBurnsMintsListModel:
+        query = get_query_from_params(**locals())
+        response: dict = await self.client.get(f'/{chain_id}/wallets/{wallet_address}/transactions/mints/?{query}')
+        return models.SwapsBurnsMintsListModel.parse_obj(response)
 
 
 sdk = DexGuru(api_key='-ER8PuY9iBB_x5n-_AYJCtF9aTRDxn2OAJtfhWMCxrU',

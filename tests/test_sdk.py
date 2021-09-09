@@ -1,4 +1,5 @@
 import time
+from pprint import pprint
 
 import pytest
 
@@ -206,21 +207,6 @@ async def test_get_token_swaps(sdk, eth_address):
 
 
 @pytest.mark.asyncio
-async def test_get_token_swaps(sdk, eth_address):
-    wallet_category = enums.CategoriesChoices.heavy.value
-    amm = enums.AmmChoices.sushiswap.value
-    txs = await sdk.get_token_swaps(1, token_address=eth_address,
-                                    wallet_category=wallet_category,
-                                    limit=5, amm_id=amm)
-    assert isinstance(txs, models.SwapsBurnsMintsListModel)
-    assert len(txs.data) == 5
-    for tx in txs.data:
-        assert tx.wallet_category == wallet_category
-        assert tx.amm_id == amm
-        assert tx.transaction_type == enums.TransactionChoices.swap
-
-
-@pytest.mark.asyncio
 async def test_get_token_burns(sdk, eth_address):
     amm = enums.AmmChoices.sushiswap.value
     txs = await sdk.get_token_burns(1, token_address=eth_address,
@@ -251,6 +237,7 @@ async def test_get_token_market_history(sdk, eth_address):
     txs = await sdk.get_token_market_history(1, token_address=eth_address,
                                              begin_timestamp=int(begin_ts), end_timestamp=int(end_ts))
     assert isinstance(txs, models.TokensHistoryListModel)
+    assert txs.total != 0
     for tx in txs.data:
         assert tx.address == eth_address
         assert isinstance(tx, models.TokenHistory)
@@ -264,6 +251,7 @@ async def test_get_token_market_history(sdk, eth_address):
 async def test_get_wallets_info(sdk, eth_wallets, polygon_wallets):
     info = await sdk.get_wallets_info(1, wallet_address=eth_wallets+polygon_wallets)
     assert isinstance(info, models.WalletsListModel)
+    assert info.total != 0
     for wallet in info.data:
         assert isinstance(wallet, models.WalletModel)
     assert len(info.data) == 4
@@ -287,3 +275,50 @@ async def test_get_wallet_info(sdk, eth_wallets, polygon_wallets):
     with pytest.raises(Exception, match='Wallet not found'):
         await sdk.get_wallet_info(1, wallet_address='invalid')
 
+
+@pytest.mark.asyncio
+async def test_get_wallet_transactions(sdk, eth_wallets, polygon_wallets):
+    txs = await sdk.get_wallet_transactions(1, wallet_address=eth_wallets[0])
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    for tx in txs.data:
+        assert isinstance(tx, models.SwapBurnMintModel)
+        assert tx.wallet_address == eth_wallets[0]
+    txs = await sdk.get_wallet_transactions(1, wallet_address='invalid')
+    assert txs.total == 0
+    assert txs.data == []
+
+
+@pytest.mark.asyncio
+async def test_get_wallet_swaps(sdk, eth_wallets):
+    txs = await sdk.get_wallet_swaps(1, wallet_address=eth_wallets[0], limit=7)
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert txs.total > 0
+    assert 0 < len(txs.data) == 7
+    for tx in txs.data:
+        assert isinstance(tx, models.SwapBurnMintModel)
+        assert tx.wallet_address == eth_wallets[0]
+        assert tx.transaction_type == enums.TransactionChoices.swap
+
+
+@pytest.mark.asyncio
+async def test_get_wallet_burns(sdk):
+    txs = await sdk.get_wallet_burns(1, wallet_address='0x935d2fd458fdf41b6f7b62471f593797866a3ce6', limit=6)
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert txs.total > 0
+    assert 0 < len(txs.data) <= 6
+    for tx in txs.data:
+        assert isinstance(tx, models.SwapBurnMintModel)
+        assert tx.wallet_address == '0x935d2fd458fdf41b6f7b62471f593797866a3ce6'
+        assert tx.transaction_type == enums.TransactionChoices.burn
+
+
+@pytest.mark.asyncio
+async def test_get_wallet_mints(sdk):
+    txs = await sdk.get_wallet_mints(1, wallet_address='0x935d2fd458fdf41b6f7b62471f593797866a3ce6', limit=5)
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert txs.total > 0
+    assert 0 < len(txs.data) <= 5
+    for tx in txs.data:
+        assert isinstance(tx, models.SwapBurnMintModel)
+        assert tx.wallet_address == '0x935d2fd458fdf41b6f7b62471f593797866a3ce6'
+        assert tx.transaction_type == enums.TransactionChoices.mint

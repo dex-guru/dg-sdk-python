@@ -4,7 +4,7 @@ from pydantic import BaseModel, constr
 from src.models.enums import TransactionChoices, ChainChoices, TokenTradeDirections
 
 
-class RestSwapBurnMintModel(BaseModel):
+class SwapBurnMintModel(BaseModel):
     amm_id: str
     chain_id: ChainChoices
     direction: Optional[TokenTradeDirections]
@@ -24,8 +24,8 @@ class RestSwapBurnMintModel(BaseModel):
 
 class SwapsBurnsMintsListModel(BaseModel):
     total: int
-    data: List[RestSwapBurnMintModel]
+    data: List[SwapBurnMintModel]
 
     @classmethod
     def from_response(cls, models, total) -> 'SwapsBurnsMintsListModel':
-        return cls(data=[RestSwapBurnMintModel.parse_obj(model) for model in models], total=total)
+        return cls(data=[SwapBurnMintModel.parse_obj(model) for model in models], total=total)
