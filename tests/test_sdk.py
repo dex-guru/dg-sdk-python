@@ -164,3 +164,69 @@ async def test_get_token_finance(sdk, eth_address):
         await sdk.get_token_finance(1, 'invalid')
 
 
+@pytest.mark.asyncio
+async def test_get_token_transactions(sdk, eth_address):
+    wallet_category = enums.CategoriesChoices.heavy.value
+    amm = enums.AmmChoices.sushiswap.value
+    txs = await sdk.get_token_transactions(1, token_address=eth_address,
+                                           wallet_category=wallet_category,
+                                           limit=5, amm_id=amm)
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert len(txs.data) == 5
+    for tx in txs.data:
+        assert tx.wallet_category == wallet_category
+        assert tx.amm_id == amm
+
+
+@pytest.mark.asyncio
+async def test_get_token_swaps(sdk, eth_address):
+    wallet_category = enums.CategoriesChoices.heavy.value
+    amm = enums.AmmChoices.sushiswap.value
+    txs = await sdk.get_token_swaps(1, token_address=eth_address,
+                                    wallet_category=wallet_category,
+                                    limit=5, amm_id=amm)
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert len(txs.data) == 5
+    for tx in txs.data:
+        assert tx.wallet_category == wallet_category
+        assert tx.amm_id == amm
+        assert tx.transaction_type == enums.TransactionChoices.swap
+
+
+@pytest.mark.asyncio
+async def test_get_token_swaps(sdk, eth_address):
+    wallet_category = enums.CategoriesChoices.heavy.value
+    amm = enums.AmmChoices.sushiswap.value
+    txs = await sdk.get_token_swaps(1, token_address=eth_address,
+                                    wallet_category=wallet_category,
+                                    limit=5, amm_id=amm)
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert len(txs.data) == 5
+    for tx in txs.data:
+        assert tx.wallet_category == wallet_category
+        assert tx.amm_id == amm
+        assert tx.transaction_type == enums.TransactionChoices.swap
+
+
+@pytest.mark.asyncio
+async def test_get_token_burns(sdk, eth_address):
+    amm = enums.AmmChoices.sushiswap.value
+    txs = await sdk.get_token_burns(1, token_address=eth_address,
+                                    limit=5, amm_id=amm)
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert len(txs.data) == 5
+    for tx in txs.data:
+        assert tx.amm_id == amm
+        assert tx.transaction_type == enums.TransactionChoices.burn
+
+
+@pytest.mark.asyncio
+async def test_get_token_mints(sdk, eth_address):
+    amm = enums.AmmChoices.sushiswap.value
+    txs = await sdk.get_token_mints(1, token_address=eth_address,
+                                    limit=5, amm_id=amm)
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert len(txs.data) == 5
+    for tx in txs.data:
+        assert tx.amm_id == amm
+        assert tx.transaction_type == enums.TransactionChoices.mint
