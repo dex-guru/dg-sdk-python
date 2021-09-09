@@ -43,7 +43,9 @@ class HTTPClient:
 
                 async with session.get(url, headers=self.headers, ssl=ssl.SSLContext(),
                                        raise_for_status=False) as response:
-                    # TODO exc details
+                    if response.status >= 400:
+                        e = await response.json()
+                        raise Exception(e.get('detail'))
                     await asyncio.sleep(0.01)
                     response_text = await response.text()
                     logging.debug(f"Fetched {url}")
