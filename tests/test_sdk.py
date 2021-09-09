@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from src.models import enums
@@ -7,7 +9,7 @@ from src import models
 
 @pytest.fixture()
 def sdk():
-    yield DexGuru(api_key='23gttG8WmsS5EYrzNu3ayfRvqAT_JQMwmI3e8SNuCrg',
+    yield DexGuru(api_key='-ER8PuY9iBB_x5n-_AYJCtF9aTRDxn2OAJtfhWMCxrU',
                   endpoint='https://api-public-stage.prod-euc1.dexguru.net')
 
 
@@ -19,6 +21,16 @@ def eth_address():
 @pytest.fixture()
 def btc_address():
     return '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599'
+
+
+@pytest.fixture()
+def eth_wallets():
+    return ['0x5452ee47f16ead43a6984f101d2dfc7ec2e714e3', '0xb7b25f87fb87bb0f4a833499cb8ce58a01184943']
+
+
+@pytest.fixture()
+def polygon_wallets():
+    return ['0x7942aec6f7a31e7e89c5477c97ca288acd205adb', '0xfa79ac8667e37dee9b1a6c2f9b9a38f94af77119']
 
 
 @pytest.mark.asyncio
@@ -230,3 +242,48 @@ async def test_get_token_mints(sdk, eth_address):
     for tx in txs.data:
         assert tx.amm_id == amm
         assert tx.transaction_type == enums.TransactionChoices.mint
+
+
+@pytest.mark.asyncio
+async def test_get_token_market_history(sdk, eth_address):
+    begin_ts = time.time() - 3000
+    end_ts = time.time() - 1000
+    txs = await sdk.get_token_market_history(1, token_address=eth_address,
+                                             begin_timestamp=int(begin_ts), end_timestamp=int(end_ts))
+    assert isinstance(txs, models.TokensHistoryListModel)
+    for tx in txs.data:
+        assert tx.address == eth_address
+        assert isinstance(tx, models.TokenHistory)
+        assert tx.timestamp > begin_ts
+        assert tx.timestamp < end_ts
+    with pytest.raises(Exception, match='Token not found'):
+        await sdk.get_token_market_history(1, ('i'*42))
+
+
+@pytest.mark.asyncio
+async def test_get_wallets_info(sdk, eth_wallets, polygon_wallets):
+    info = await sdk.get_wallets_info(1, wallet_address=eth_wallets+polygon_wallets)
+    assert isinstance(info, models.WalletsListModel)
+    for wallet in info.data:
+        assert isinstance(wallet, models.WalletModel)
+    assert len(info.data) == 4
+    info = await sdk.get_wallets_info(1, wallet_address=polygon_wallets)
+    assert isinstance(info, models.WalletsListModel)
+    assert len(info.data) == 2
+    for wallet in info.data:
+        assert wallet.category
+        assert wallet.volume_1m_usd is None
+    with pytest.raises(Exception, match='Wallet not found'):
+        await sdk.get_wallets_info(1, wallet_address=['invalid'])
+
+
+@pytest.mark.asyncio
+async def test_get_wallet_info(sdk, eth_wallets, polygon_wallets):
+    wallet = await sdk.get_wallet_info(1, wallet_address=eth_wallets[0])
+    assert isinstance(wallet, models.WalletModel)
+    wallet = await sdk.get_wallet_info(1, wallet_address=polygon_wallets[0])
+    assert wallet.category
+    assert wallet.volume_1m_usd is None
+    with pytest.raises(Exception, match='Wallet not found'):
+        await sdk.get_wallet_info(1, wallet_address='invalid')
+

@@ -190,12 +190,42 @@ class DexGuru:
         response: dict = await self.client.get(f'/{chain_id}/tokens/{token_address}/transactions/mints/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
+    async def get_token_market_history(
+            self,
+            chain_id: int,
+            token_address: str,
+            begin_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = START_BLOCK_TIMESTAMP,
+            end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
+    ) -> models.TokensHistoryListModel:
+        query = get_query_from_params(**locals())
+        response: dict = await self.client.get(f'/{chain_id}/tokens/{token_address}/market/history/?{query}')
+        return models.TokensHistoryListModel.parse_obj(response)
 
-sdk = DexGuru(api_key='23gttG8WmsS5EYrzNu3ayfRvqAT_JQMwmI3e8SNuCrg',
+    async def get_wallets_info(
+            self,
+            chain_id: int,
+            wallet_address: List[str]  # todo _addresses
+    ) -> models.WalletsListModel:
+        wallet_address = ','.join(wallet_address)
+        query = get_query_from_params(**locals())
+        response: dict = await self.client.get(f'/{chain_id}/wallets/?{query}')
+        return models.WalletsListModel.parse_obj(response)
+
+    async def get_wallet_info(
+            self,
+            chain_id: int,
+            wallet_address: str  # todo _addresses
+    ) -> models.WalletModel:
+        response: dict = await self.client.get(f'/{chain_id}/wallets/{wallet_address}')
+        return models.WalletModel.parse_obj(response)
+
+
+sdk = DexGuru(api_key='-ER8PuY9iBB_x5n-_AYJCtF9aTRDxn2OAJtfhWMCxrU',
               endpoint='https://api-public-stage.prod-euc1.dexguru.net')
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    d = loop.run_until_complete(sdk.get_token_transactions(1, token_address='invalid'))
+    d = loop.run_until_complete(
+        sdk.get_wallets_info(1, wallet_address=['0x5452ee47f16ead43a6984f101d2dfc7ec2e714e3', '0xb7b25f87fb87bb0f4a833499cb8ce58a01184943']))
     print(d)
     print(type(d))

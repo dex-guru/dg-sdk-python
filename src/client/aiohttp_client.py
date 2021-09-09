@@ -45,7 +45,7 @@ class HTTPClient:
                                        raise_for_status=False) as response:
                     if response.status >= 400:
                         e = await response.json()
-                        raise Exception(e.get('detail'))
+                        raise Exception(e.get('detail', e))
                     await asyncio.sleep(0.01)
                     response_text = await response.text()
                     logging.debug(f"Fetched {url}")
