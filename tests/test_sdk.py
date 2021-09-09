@@ -232,10 +232,10 @@ async def test_get_token_mints(sdk, eth_address):
 
 @pytest.mark.asyncio
 async def test_get_token_market_history(sdk, eth_address):
-    begin_ts = time.time() - 3000
-    end_ts = time.time() - 1000
+    begin_ts = int(time.time() - 3000)
+    end_ts = int(time.time() - 1000)
     txs = await sdk.get_token_market_history(1, token_address=eth_address,
-                                             begin_timestamp=int(begin_ts), end_timestamp=int(end_ts))
+                                             begin_timestamp=begin_ts, end_timestamp=end_ts)
     assert isinstance(txs, models.TokensHistoryListModel)
     assert txs.total != 0
     for tx in txs.data:
@@ -244,12 +244,12 @@ async def test_get_token_market_history(sdk, eth_address):
         assert tx.timestamp > begin_ts
         assert tx.timestamp < end_ts
     with pytest.raises(Exception, match='Token not found'):
-        await sdk.get_token_market_history(1, ('i'*42))
+        await sdk.get_token_market_history(1, ('i' * 42))
 
 
 @pytest.mark.asyncio
 async def test_get_wallets_info(sdk, eth_wallets, polygon_wallets):
-    info = await sdk.get_wallets_info(1, wallet_address=eth_wallets+polygon_wallets)
+    info = await sdk.get_wallets_info(1, wallet_address=eth_wallets + polygon_wallets)
     assert isinstance(info, models.WalletsListModel)
     assert info.total != 0
     for wallet in info.data:
@@ -261,7 +261,7 @@ async def test_get_wallets_info(sdk, eth_wallets, polygon_wallets):
     for wallet in info.data:
         assert wallet.category
         assert wallet.volume_1m_usd is None
-    with pytest.raises(Exception, match='Wallet not found'):
+    with pytest.raises(Exception, match='Wallets not found'):
         await sdk.get_wallets_info(1, wallet_address=['invalid'])
 
 
@@ -322,3 +322,136 @@ async def test_get_wallet_mints(sdk):
         assert isinstance(tx, models.SwapBurnMintModel)
         assert tx.wallet_address == '0x935d2fd458fdf41b6f7b62471f593797866a3ce6'
         assert tx.transaction_type == enums.TransactionChoices.mint
+
+
+@pytest.mark.asyncio
+async def test_get_amms_swaps(sdk, eth_address):
+    begin_ts = time.time() - 3000
+    end_ts = time.time() - 1000
+    wallet_category = enums.CategoriesChoices.noob.value
+    txs = await sdk.get_amms_swaps(1, token_address=eth_address, wallet_category=wallet_category, limit=8,
+                                   begin_timestamp=int(begin_ts), end_timestamp=int(end_ts))
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert txs.total > 0
+    assert len(txs.data) == 8
+    for tx in txs.data:
+        assert isinstance(tx, models.SwapBurnMintModel)
+        assert tx.wallet_category == wallet_category
+        assert tx.transaction_type == enums.TransactionChoices.swap
+        assert eth_address == tx.tokens_in[0]['address'] or eth_address == tx.tokens_out[0]['address']
+        assert tx.timestamp >= begin_ts
+        assert tx.timestamp <= end_ts
+
+
+@pytest.mark.asyncio
+async def test_get_amms_burns(sdk, eth_address):
+    begin_ts = time.time() - 3000
+    end_ts = time.time() - 1000
+    txs = await sdk.get_amms_burns(1, token_address=eth_address, limit=8,
+                                   begin_timestamp=int(begin_ts), end_timestamp=int(end_ts))
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert txs.total > 0
+    assert len(txs.data) == 8
+    for tx in txs.data:
+        assert isinstance(tx, models.SwapBurnMintModel)
+        assert tx.transaction_type == enums.TransactionChoices.burn
+        assert eth_address in [item.get('address') for item in tx.tokens_in + tx.tokens_out]
+        assert tx.timestamp >= begin_ts
+        assert tx.timestamp <= end_ts
+
+
+@pytest.mark.asyncio
+async def test_get_amms_mints(sdk, eth_address):
+    begin_ts = time.time() - 3000
+    end_ts = time.time() - 1000
+    txs = await sdk.get_amms_mints(1, token_address=eth_address, limit=8,
+                                   begin_timestamp=int(begin_ts), end_timestamp=int(end_ts))
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert txs.total > 0
+    assert len(txs.data) == 8
+    for tx in txs.data:
+        assert isinstance(tx, models.SwapBurnMintModel)
+        assert tx.transaction_type == enums.TransactionChoices.mint
+        assert eth_address in [item.get('address') for item in tx.tokens_in + tx.tokens_out]
+        assert tx.timestamp >= begin_ts
+        assert tx.timestamp <= end_ts
+
+
+@pytest.mark.asyncio
+async def test_get_amm_swaps(sdk, eth_address):
+    amm = enums.AmmChoices.uniswap_v3.value
+    chain = enums.ChainChoices.eth.value
+    begin_ts = time.time() - 3000
+    end_ts = time.time() - 1000
+    wallet_category = enums.CategoriesChoices.noob.value
+    txs = await sdk.get_amm_swaps(chain, amm_id=amm, token_address=eth_address, wallet_category=wallet_category,
+                                  limit=8,
+                                  begin_timestamp=int(begin_ts), end_timestamp=int(end_ts))
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert txs.total > 0
+    assert len(txs.data) == 8
+    for tx in txs.data:
+        assert isinstance(tx, models.SwapBurnMintModel)
+        assert tx.wallet_category == wallet_category
+        assert tx.transaction_type == enums.TransactionChoices.swap
+        assert eth_address == tx.tokens_in[0]['address'] or eth_address == tx.tokens_out[0]['address']
+        assert tx.timestamp >= begin_ts
+        assert tx.timestamp <= end_ts
+        assert tx.amm_id == amm
+
+
+@pytest.mark.asyncio
+async def test_get_amm_burns(sdk):
+    amm = enums.AmmChoices.quickswap.value
+    chain = enums.ChainChoices.polygon.value
+    begin_ts = time.time() - 3000
+    end_ts = time.time() - 1000
+    txs = await sdk.get_amm_burns(chain, amm_id=amm, limit=8,
+                                  begin_timestamp=int(begin_ts), end_timestamp=int(end_ts))
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert txs.total > 0
+    assert len(txs.data) == 8
+    for tx in txs.data:
+        assert isinstance(tx, models.SwapBurnMintModel)
+        assert tx.transaction_type == enums.TransactionChoices.burn
+        assert tx.timestamp >= begin_ts
+        assert tx.timestamp <= end_ts
+        assert tx.amm_id == amm
+
+
+@pytest.mark.asyncio
+async def test_get_amm_mints(sdk):
+    amm = enums.AmmChoices.pancakeswap.value
+    chain = enums.ChainChoices.bsc.value
+    begin_ts = int(time.time() - 3000)
+    end_ts = int(time.time() - 1000)
+    txs = await sdk.get_amm_mints(chain, amm_id=amm, limit=8)
+    assert isinstance(txs, models.SwapsBurnsMintsListModel)
+    assert txs.total > 0
+    assert len(txs.data) == 8
+    for tx in txs.data:
+        assert isinstance(tx, models.SwapBurnMintModel)
+        assert tx.transaction_type == enums.TransactionChoices.mint
+        assert tx.timestamp >= begin_ts
+        assert tx.timestamp <= end_ts
+        assert tx.amm_id == amm
+
+
+@pytest.mark.asyncio
+async def test_get_all_amm_inventory(sdk):
+    chain = enums.ChainChoices.eth.value
+    amms = await sdk.get_all_amm_inventory(chain)
+    assert amms
+    assert len(amms.data) > 0
+    assert isinstance(amms, models.AmmListModel)
+    for amm in amms.data:
+        assert isinstance(amm, models.AmmModel)
+
+
+@pytest.mark.asyncio
+async def test_get_amm_inventory(sdk):
+    chain = enums.ChainChoices.eth.value
+    amm_ = enums.AmmChoices.uniswap_v3.value
+    amm = await sdk.get_amm_inventory(chain, amm_)
+    assert isinstance(amm, models.AmmModel)
+

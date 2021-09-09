@@ -10,8 +10,7 @@ class AmmModel(BaseModel):
     description: str
     type: str
     last_pair_index: int
-    router_address: List
-    factory_address: str
+    contracts: dict
 
 
 class AmmListModel(BaseModel):
