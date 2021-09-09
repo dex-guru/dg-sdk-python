@@ -11,6 +11,16 @@ def sdk():
                   endpoint='https://api-public-stage.prod-euc1.dexguru.net')
 
 
+@pytest.fixture()
+def eth_address():
+    return '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+
+
+@pytest.fixture()
+def btc_address():
+    return '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599'
+
+
 @pytest.mark.asyncio
 async def test_get_chains(sdk):
     chains = await sdk.get_chains()
@@ -116,3 +126,41 @@ async def test_get_txs_mints(sdk):
 async def test_get_tokens_inventory(sdk):
     tokens = await sdk.get_tokens_inventory(1, name='eth')
     assert isinstance(tokens, models.TokensInventoryListModel)
+    for token in tokens.data:
+        assert isinstance(token, models.TokenInventoryModel)
+    with pytest.raises(Exception, match='Specify name'):
+        await sdk.get_tokens_inventory(1)
+
+
+@pytest.mark.asyncio
+async def test_get_tokens_finance(sdk, btc_address, eth_address):
+    tokens = await sdk.get_tokens_finance(1, limit=5)
+    assert isinstance(tokens, models.TokensFinanceListModel)
+    assert len(tokens.data) == 5
+    for token in tokens.data:
+        assert isinstance(token, models.TokenFinanceModel)
+    token_addresses = [btc_address, eth_address]
+    tokens = await sdk.get_tokens_finance(1, token_addresses=token_addresses, limit=10)
+    assert len(tokens.data) == 2
+    for token in tokens.data:
+        assert token.address in token_addresses
+
+
+@pytest.mark.asyncio
+async def test_get_token_inventory(sdk, eth_address):
+    token = await sdk.get_token_inventory(1, eth_address)
+    assert isinstance(token, models.TokenInventoryModel)
+    assert token.address == eth_address
+    with pytest.raises(Exception, match='Token not found'):
+        await sdk.get_token_inventory(1, 'invalid')
+
+
+@pytest.mark.asyncio
+async def test_get_token_finance(sdk, eth_address):
+    token = await sdk.get_token_finance(1, eth_address)
+    assert isinstance(token, models.TokenFinanceModel)
+    assert token.address == eth_address
+    with pytest.raises(Exception, match='Not found token finance'):
+        await sdk.get_token_finance(1, 'invalid')
+
+
