@@ -16,8 +16,3 @@ class AmmModel(BaseModel):
 class AmmListModel(BaseModel):
     total: int
     data: List[AmmModel]
-
-    @classmethod
-    def from_response(cls, models: List):
-        data = [AmmModel.parse_obj(model) for model in models]
-        return cls(data=data, total=len(data))

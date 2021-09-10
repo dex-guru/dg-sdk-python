@@ -1,4 +1,5 @@
 from typing import List, Optional
+
 from pydantic import BaseModel, constr
 
 from src.models.enums import TransactionChoices, ChainChoices, TokenTradeDirections
@@ -25,7 +26,3 @@ class SwapBurnMintModel(BaseModel):
 class SwapsBurnsMintsListModel(BaseModel):
     total: int
     data: List[SwapBurnMintModel]
-
-    @classmethod
-    def from_response(cls, models, total) -> 'SwapsBurnsMintsListModel':
-        return cls(data=[SwapBurnMintModel.parse_obj(model) for model in models], total=total)

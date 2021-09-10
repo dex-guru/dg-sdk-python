@@ -1,4 +1,5 @@
 from typing import List
+
 from pydantic import BaseModel, constr
 
 
@@ -13,7 +14,3 @@ class WalletModel(BaseModel):
 class WalletsListModel(BaseModel):
     total: int
     data: List[WalletModel]
-
-    @classmethod
-    def from_response(cls, data: List[dict]):
-        return cls(data=[WalletModel.parse_obj(item) for item in data], total=len(data))
