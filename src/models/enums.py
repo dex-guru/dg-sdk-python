@@ -23,20 +23,6 @@ class AmmChoices(str, Enum, metaclass=ContaineredEnum):
     quickswap = 'quickswap'
 
 
-class AmmIDChoices(str, Enum, metaclass=ContaineredEnum):
-    uniswap_v2 = 1
-    uniswap_v3 = 2
-    sushiswap = 3
-    pancakeswap = 4
-    quickswap = 5
-
-
-class NetworkChoices(str, Enum, metaclass=ContaineredEnum):
-    eth = 'eth'
-    bsc = 'bsc'
-    polygon = 'polygon'
-
-
 class ChainChoices(str, Enum, metaclass=ContaineredEnum):
     eth = 1
     bsc = 56
@@ -52,11 +38,6 @@ class TransactionChoices(str, Enum, metaclass=ContaineredEnum):
 class OrderChoices(str, Enum):
     asc = 'asc'
     desc = 'desc'
-
-
-class CurrencyChoices(str, Enum, metaclass=ContaineredEnum):
-    USD = 'USD'
-    ETH = 'ETH'
 
 
 class SortChoices(str, Enum):
@@ -86,47 +67,12 @@ class SortChoices(str, Enum):
     network = 'network'
 
 
-class Periods(str, Enum):
-    minute = 'minute'
-    hour = 'hour'
-    day = 'day'
-    week = 'week'
-    month = 'month'
-    year = 'year'
-
-
-class NotificatorChoises(str, Enum):
-    tg_bot = 'tg'
-    webpush = 'wp'
-
-
-class NativeTokenAddresses(str, Enum):
-    eth = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'      # ETH
-    polygon = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'  # MATIC
-    bsc = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c'      # BNB
-
-    @classmethod
-    def is_native(cls, network: NetworkChoices, address: str):
-        return cls[network].lower() == address.lower()
-
-
 class CategoriesChoices(str, Enum, metaclass=ContaineredEnum):
     noob = 'noob'
     casual = 'casual'
     medium = 'medium'
     heavy = 'heavy'
     bot = 'bot'
-
-
-class BotActionsChoices(str, Enum, metaclass=ContaineredEnum):
-    add = 'add'
-    change = 'change'
-    remove = 'remove'
-
-
-class BotDirectionsChoices(str, Enum, metaclass=ContaineredEnum):
-    gt = '>'
-    lt = '<'
 
 
 class TokenTradeDirections(str, Enum):
