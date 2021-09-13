@@ -7,7 +7,6 @@ class ChainModel(BaseModel):
     chain_id: int
     name: str
     description: str
-    last_block_number: int
 
 
 class ChainsListModel(BaseModel):
