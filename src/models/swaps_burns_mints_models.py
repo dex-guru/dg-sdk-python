@@ -3,11 +3,10 @@ from typing import List, Optional
 
 from pydantic import BaseModel, constr
 
-from src.models import BaseResponseModel
-from src.models.enums import TransactionChoices, ChainChoices, TokenTradeDirections
+from src.models.choices import TransactionChoices, ChainChoices, TokenTradeDirections
 
 
-class SwapBurnMintModel(BaseResponseModel):
+class SwapBurnMintModel(BaseModel):
     amm: str
     chain_id: ChainChoices
     direction: Optional[TokenTradeDirections]
@@ -35,7 +34,7 @@ class SwapBurnMintModel(BaseResponseModel):
         wallet_address = 'wallet_address'
 
 
-class SwapsBurnsMintsListModel(BaseResponseModel):
+class SwapsBurnsMintsListModel(BaseModel):
     SortFields = SwapBurnMintModel.SortFields
     total: int
     data: List[SwapBurnMintModel]
