@@ -7,6 +7,7 @@ setup(
     version=__version__,
     url='https://docs.dex.guru/',
     packages=find_packages(),
+    long_description_content_type='text/markdown',
     long_description=open(join(dirname(__file__), 'README.md')).read(),
     install_requires=[
         'aiohttp==3.7.4.post0',
