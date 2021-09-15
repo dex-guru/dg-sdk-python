@@ -1,4 +1,3 @@
-import asyncio
 from typing import List, Optional
 
 from pydantic import HttpUrl, conint
@@ -9,7 +8,7 @@ from src.models.choices import *
 from src.utils.get_query import get_query_from_params
 
 START_BLOCK_TIMESTAMP = 1588723228
-DEFAULT_DOMAIN = 'https://api-public-stage.prod-euc1.dexguru.net/'
+DEFAULT_DOMAIN = 'https://api.dev.dex.guru/'
 
 
 class DexGuru:

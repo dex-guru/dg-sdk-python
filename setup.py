@@ -1,5 +1,7 @@
-from setuptools import setup, find_packages
 from os.path import join, dirname
+
+from setuptools import setup, find_packages
+
 from src import __version__
 
 setup(
@@ -7,6 +9,7 @@ setup(
     version=__version__,
     url='https://docs.dex.guru/',
     packages=find_packages(),
+    license='MIT License',
     long_description_content_type='text/markdown',
     long_description=open(join(dirname(__file__), 'README.md')).read(),
     install_requires=[
@@ -21,4 +24,6 @@ setup(
     ],
     python_requires='>=3.8',
     test_suite='tests',
+    project_urls={
+        'GitHub': 'https://github.com/dex-guru/dg-sdk-python'}
 )
