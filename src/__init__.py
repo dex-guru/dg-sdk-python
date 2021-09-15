@@ -1,2 +1,2 @@
 __version__ = '0.0.2'
-from sdk import DexGuru
+from src.sdk import DexGuru
