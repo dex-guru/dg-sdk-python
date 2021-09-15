@@ -386,13 +386,3 @@ class DexGuru:
     async def get_amm_inventory(self, chain_id: int, amm: AmmChoices) -> models.AmmModel:
         response: dict = await self.client.get(f'/{chain_id}/amms/{amm}')
         return models.AmmModel.parse_obj(response)
-
-
-sdk = DexGuru(api_key='-ER8PuY9iBB_x5n-_AYJCtF9aTRDxn2OAJtfhWMCxrU',
-              domain='https://api-public-stage.prod-euc1.dexguru.net')
-
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    d = loop.run_until_complete(
-        sdk.get_amm_mints(1, amm=AmmChoices.uniswap, ))
-    print(d)
