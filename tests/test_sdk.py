@@ -8,10 +8,6 @@ from dexguru_sdk.sdk.dg_sdk import DexGuru
 DEFAULT_DOMAIN = 'https://api.dev.dex.guru'
 
 
-# @pytest.fixture()
-# def sdk():
-#     yield DexGuru(api_key='CkGWZAcDE0h5XRqR04DhtvCNofL-dfDB4WvLzKhraho',
-#                    domain='http://localhost:8000')
 @pytest.fixture()
 def sdk():
     yield DexGuru(api_key='CkGWZAcDE0h5XRqR04DhtvCNofL-dfDB4WvLzKhraho',
@@ -35,7 +31,7 @@ def eth_wallets():
 
 @pytest.fixture()
 def polygon_wallets():
-    return ['0xc11b30efc7fd436709982136e0cbc4377b7fb267', '0xef32efc7c123f73168ebeb7b9776d31bb8bb6ddd']
+    return ['0x568315627841754c917ee45a50b26889090e787a', '0x7737d3742ddc67f1443b40cbe6d401d649d3906a']
 
 
 @pytest.mark.asyncio
@@ -350,8 +346,8 @@ async def test_get_amms_swaps(sdk, eth_address):
 
 @pytest.mark.asyncio
 async def test_get_amms_burns(sdk, eth_address):
-    amm = choices.AmmChoices.uniswap_v3.value
-    txs = await sdk.get_amms_burns(1, amms=amm, token_address=eth_address, limit=8)
+    amms = [choices.AmmChoices.uniswap_v3.value, choices.AmmChoices.uniswap.value]
+    txs = await sdk.get_amms_burns(1, amms=amms, token_address=eth_address, limit=8)
     assert isinstance(txs, models.SwapsBurnsMintsListModel)
     assert txs.total > 0
     assert len(txs.data) == 8
@@ -359,7 +355,7 @@ async def test_get_amms_burns(sdk, eth_address):
         assert isinstance(tx, models.SwapBurnMintModel)
         assert tx.transaction_type == choices.TransactionChoices.burn
         assert eth_address in [item.get('address') for item in tx.tokens_in + tx.tokens_out]
-        assert tx.amm == amm
+        assert tx.amm in amms
 
 
 @pytest.mark.asyncio

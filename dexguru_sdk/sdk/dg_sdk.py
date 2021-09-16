@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from pydantic import HttpUrl, conint
 
@@ -297,7 +297,8 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
             wallet_category: CategoriesChoices = None,
     ) -> models.SwapsBurnsMintsListModel:
-        amms = ','.join(amms)
+        if isinstance(amms, list):
+            amms = ','.join(amms)
         query = get_query_from_params(**locals())
         response: dict = await self._client.get(f'/{chain_id}/amms/swaps/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
@@ -305,7 +306,7 @@ class DexGuru:
     async def get_amms_burns(
             self,
             chain_id: int,
-            amms: List[str] = None,
+            amms: Union[List[str], str] = None,
             token_address: Optional[str] = None,
             sort_by: str = None,
             limit: conint(gt=0, le=100) = 10,
@@ -313,7 +314,8 @@ class DexGuru:
             begin_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = START_BLOCK_TIMESTAMP,
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
-        amms = ','.join(amms)
+        if isinstance(amms, list):
+            amms = ','.join(amms)
         query = get_query_from_params(**locals())
         response: dict = await self._client.get(f'/{chain_id}/amms/burns/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
@@ -321,7 +323,7 @@ class DexGuru:
     async def get_amms_mints(
             self,
             chain_id: int,
-            amms: List[str] = None,
+            amms: Union[List[str], str] = None,
             token_address: Optional[str] = None,
             sort_by: str = None,
             limit: conint(gt=0, le=100) = 10,
@@ -329,7 +331,8 @@ class DexGuru:
             begin_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = START_BLOCK_TIMESTAMP,
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
-        amms = ','.join(amms)
+        if isinstance(amms, list):
+            amms = ','.join(amms)
         query = get_query_from_params(**locals())
         response: dict = await self._client.get(f'/{chain_id}/amms/mints/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
