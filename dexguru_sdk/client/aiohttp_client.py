@@ -7,9 +7,9 @@ import aiohttp
 import ujson
 from aiohttp import ClientTimeout
 from pydantic import HttpUrl
-
-from src import __version__
-from src.client.exceptions import RequestException
+from urllib.parse import urljoin
+from dexguru_sdk.client.exceptions import RequestException
+import dexguru_sdk
 
 MAX_RETRY_COUNT = 10
 SSL_PROTOCOLS = (asyncio.sslproto.SSLProtocol,)
@@ -23,20 +23,20 @@ else:
 
 class HTTPClient:
 
-    def __init__(self, headers: dict, url_prefix: HttpUrl):
+    def __init__(self, headers: dict, domain: HttpUrl):
         headers = headers or {}
         default_headers = {
-            'User-Agent': f"Python DexGuru SDK v{__version__} ",
+            'User-Agent': f"Python DexGuru SDK v{dexguru_sdk.__version__} ",
             "Content-Type": "application/json",
         }
         self.headers = {**default_headers, **headers}
         self.timeout = ClientTimeout(total=60 * 60, connect=60 * 60, sock_connect=60 * 60, sock_read=60 * 60)
         self.retries_count = 0
         self.retry_sleep = 3
-        self.url_prefix = url_prefix
+        self.domain = domain
 
     async def get(self, url: str) -> Union[dict, None]:
-        url = self.url_prefix + '/v1/chain' + url
+        url = urljoin(self.domain, 'v1/chain' + url)
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=self.timeout,
                                          raise_for_status=False) as session:
             logging.debug(f"Fetching {url}")

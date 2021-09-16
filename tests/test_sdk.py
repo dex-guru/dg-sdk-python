@@ -1,17 +1,21 @@
-import time
-
 import pytest
 
-from src import models
-from src.client.exceptions import RequestException
-from src.models import choices
-from src.sdk.dg_sdk import DexGuru
+from dexguru_sdk import models
+from dexguru_sdk.client.exceptions import RequestException
+from dexguru_sdk.models import choices
+from dexguru_sdk.sdk.dg_sdk import DexGuru
+
+DEFAULT_DOMAIN = 'https://api.dev.dex.guru'
 
 
+# @pytest.fixture()
+# def sdk():
+#     yield DexGuru(api_key='CkGWZAcDE0h5XRqR04DhtvCNofL-dfDB4WvLzKhraho',
+#                    domain='http://localhost:8000')
 @pytest.fixture()
 def sdk():
-    yield DexGuru(api_key='-ER8PuY9iBB_x5n-_AYJCtF9aTRDxn2OAJtfhWMCxrU',
-                  domain='https://api-public-stage.prod-euc1.dexguru.net')
+    yield DexGuru(api_key='CkGWZAcDE0h5XRqR04DhtvCNofL-dfDB4WvLzKhraho',
+                  domain=DEFAULT_DOMAIN)
 
 
 @pytest.fixture()
@@ -26,12 +30,12 @@ def btc_address():
 
 @pytest.fixture()
 def eth_wallets():
-    return ['0x5452ee47f16ead43a6984f101d2dfc7ec2e714e3', '0xb7b25f87fb87bb0f4a833499cb8ce58a01184943']
+    return ['0xd68fe83d3834bf35c6e1aa8a9d81c56249a61881', '0x95ff3e600248bba51764913058483e5d743a848e']
 
 
 @pytest.fixture()
 def polygon_wallets():
-    return ['0x7942aec6f7a31e7e89c5477c97ca288acd205adb', '0xfa79ac8667e37dee9b1a6c2f9b9a38f94af77119']
+    return ['0xc11b30efc7fd436709982136e0cbc4377b7fb267', '0xef32efc7c123f73168ebeb7b9776d31bb8bb6ddd']
 
 
 @pytest.mark.asyncio
@@ -139,12 +143,12 @@ async def test_get_txs_mints(sdk):
 
 @pytest.mark.asyncio
 async def test_get_tokens_inventory(sdk):
-    tokens = await sdk.get_tokens_inventory(1, name='eth')
+    tokens = await sdk.search_tokens_by_name_or_symbol(1, name='eth')
     assert isinstance(tokens, models.TokensInventoryListModel)
     for token in tokens.data:
         assert isinstance(token, models.TokenInventoryModel)
     with pytest.raises(Exception, match='Specify name'):
-        await sdk.get_tokens_inventory(1)
+        await sdk.search_tokens_by_name_or_symbol(1)
 
 
 @pytest.mark.asyncio
@@ -240,17 +244,13 @@ async def test_get_token_mints(sdk, eth_address):
 
 @pytest.mark.asyncio
 async def test_get_token_market_history(sdk, eth_address):
-    begin_ts = int(time.time() - 3000)
-    end_ts = int(time.time() - 1000)
-    txs = await sdk.get_token_market_history(1, token_address=eth_address,
-                                             begin_timestamp=begin_ts, end_timestamp=end_ts)
+    txs = await sdk.get_token_market_history(1, token_address=eth_address)
     assert isinstance(txs, models.TokensHistoryListModel)
     assert txs.total != 0
     for tx in txs.data:
         assert tx.address == eth_address
         assert isinstance(tx, models.TokenHistory)
-        assert tx.timestamp > begin_ts
-        assert tx.timestamp < end_ts
+
     with pytest.raises(RequestException, match='Token not found'):
         await sdk.get_token_market_history(1, ('i' * 42))
 
@@ -378,14 +378,11 @@ async def test_get_amms_mints(sdk, eth_address):
 
 @pytest.mark.asyncio
 async def test_get_amm_swaps(sdk, eth_address):
-    amm = choices.AmmChoices.uniswap_v3.value
+    amm = choices.AmmChoices.uniswap.value
     chain = choices.ChainChoices.eth.value
-    begin_ts = time.time() - 3000
-    end_ts = time.time() - 1000
     wallet_category = choices.CategoriesChoices.noob.value
     txs = await sdk.get_amm_swaps(chain, amm=amm, token_address=eth_address, wallet_category=wallet_category,
-                                  limit=8,
-                                  begin_timestamp=int(begin_ts), end_timestamp=int(end_ts))
+                                  limit=8)
     assert isinstance(txs, models.SwapsBurnsMintsListModel)
     assert txs.total > 0
     assert len(txs.data) == 8
@@ -394,8 +391,6 @@ async def test_get_amm_swaps(sdk, eth_address):
         assert tx.wallet_category == wallet_category
         assert tx.transaction_type == choices.TransactionChoices.swap
         assert eth_address == tx.tokens_in[0]['address'] or eth_address == tx.tokens_out[0]['address']
-        assert tx.timestamp >= begin_ts
-        assert tx.timestamp <= end_ts
         assert tx.amm == amm
 
 
@@ -403,18 +398,13 @@ async def test_get_amm_swaps(sdk, eth_address):
 async def test_get_amm_burns(sdk):
     amm = choices.AmmChoices.quickswap.value
     chain = choices.ChainChoices.polygon.value
-    begin_ts = time.time() - 3000
-    end_ts = time.time() - 1000
-    txs = await sdk.get_amm_burns(chain, amm=amm, limit=8,
-                                  begin_timestamp=int(begin_ts), end_timestamp=int(end_ts))
+    txs = await sdk.get_amm_burns(chain, amm=amm, limit=8)
     assert isinstance(txs, models.SwapsBurnsMintsListModel)
     assert txs.total > 0
     assert len(txs.data) == 8
     for tx in txs.data:
         assert isinstance(tx, models.SwapBurnMintModel)
         assert tx.transaction_type == choices.TransactionChoices.burn
-        assert tx.timestamp >= begin_ts
-        assert tx.timestamp <= end_ts
         assert tx.amm == amm
 
 

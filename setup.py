@@ -2,21 +2,17 @@ from os.path import join, dirname
 
 from setuptools import setup, find_packages
 
-from src import __version__
+from dexguru_sdk import __version__
 
 setup(
-    name='dex-guru-sdk',
+    name='dexguru_sdk',
     version=__version__,
-    url='https://docs.dex.guru/',
+    url='https://dex.guru',
     packages=find_packages(),
     license='MIT License',
     long_description_content_type='text/markdown',
     long_description=open(join(dirname(__file__), 'README.md')).read(),
-    install_requires=[
-        'aiohttp==3.7.4.post0',
-        'ujson==4.0.2',
-        'pydantic==1.8.2',
-    ],
+    install_requires=open('requirements.txt').read(),
     classifiers=[
         "Programming Language :: Python :: 3.8",
         "License :: OSI Approved :: MIT License",
@@ -25,5 +21,6 @@ setup(
     python_requires='>=3.8',
     test_suite='tests',
     project_urls={
+        'Documentation': 'https://docs.dex.guru/',
         'GitHub': 'https://github.com/dex-guru/dg-sdk-python'}
 )
