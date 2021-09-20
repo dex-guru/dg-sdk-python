@@ -3,11 +3,11 @@ from typing import List, Optional
 
 from pydantic import BaseModel, constr
 
-from dexguru_sdk.models.choices import TransactionChoices, ChainChoices, TokenTradeDirections
+from dexguru_sdk.models.choices import TransactionChoices, ChainChoices, TokenTradeDirections, AmmChoices
 
 
 class SwapBurnMintModel(BaseModel):
-    amm: str
+    amm: AmmChoices
     chain_id: ChainChoices
     direction: Optional[TokenTradeDirections]
     transaction_address: str

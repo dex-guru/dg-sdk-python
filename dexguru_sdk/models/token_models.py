@@ -36,7 +36,7 @@ class TokensFinanceListModel(BaseModel):
     data: List[TokenFinanceModel]
 
 
-class TokenHistory(BaseModel):
+class TokenHistoryModel(BaseModel):
     address: str
     volume_24h: float = Field(alias='volume24h_eth')
     liquidity: float
@@ -55,4 +55,4 @@ class TokenHistory(BaseModel):
 
 class TokensHistoryListModel(BaseModel):
     total: int
-    data: List[TokenHistory]
+    data: List[TokenHistoryModel]

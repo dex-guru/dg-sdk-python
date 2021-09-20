@@ -1,3 +1,4 @@
+import urllib.parse
 from typing import List, Optional, Union
 
 from pydantic import HttpUrl, conint
@@ -9,23 +10,33 @@ from dexguru_sdk.utils.get_query import get_query_from_params
 
 START_BLOCK_TIMESTAMP = 1588723228
 DEFAULT_DOMAIN = 'https://api.dev.dex.guru'
+API_VERSION = 'v1/'
 
 
 class DexGuru:
     """Main class for getting data.
 
     For initialization, pass the api key of your project.
-    If you have special domain, put in
+    If you have especial domain address, put it into 'domain' arg.
+
+    Read more about methods and args on https://docs.dex.guru/api.
+
+    Args:
+        api_key (str): API key of dev.dex.guru project.
+        domain (str, optional): Especial API domain address.
     """
+
     def __init__(self, api_key: str, domain: Optional[HttpUrl] = DEFAULT_DOMAIN):
+        domain = urllib.parse.urljoin(domain, API_VERSION)
         self._client = HTTPClient(headers={'api-key': api_key}, domain=domain)
+        self._chain_prefix = 'chain'
 
     async def get_chains(self) -> models.ChainsListModel:
-        response: dict = await self._client.get('/')
+        response: dict = await self._client.get(f'{self._chain_prefix}')
         return models.ChainsListModel.parse_obj(response)
 
     async def get_chain(self, chain_id: int) -> models.ChainModel:
-        response: dict = await self._client.get(f'/{chain_id}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}')
         return models.ChainModel.parse_obj(response)
 
     async def get_transactions(
@@ -40,7 +51,7 @@ class DexGuru:
             wallet_category: CategoriesChoices = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/transactions?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/transactions?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_txs_swaps(
@@ -55,7 +66,7 @@ class DexGuru:
             wallet_category: CategoriesChoices = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/transactions/swaps/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/transactions/swaps/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_txs_burns(
@@ -69,7 +80,7 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/transactions/burns/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/transactions/burns/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_txs_mints(
@@ -83,7 +94,7 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/transactions/mints/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/transactions/mints/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def search_tokens_by_name_or_symbol(
@@ -98,7 +109,7 @@ class DexGuru:
         if not name and not symbol:
             raise ValueError('Specify name or symbol for search')
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/tokens/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/tokens/?{query}')
         return models.TokensInventoryListModel.parse_obj(response)
 
     async def get_tokens_finance(
@@ -113,7 +124,7 @@ class DexGuru:
         if token_addresses:
             token_addresses = ','.join(token_addresses)
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/tokens/market/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/tokens/market/?{query}')
         return models.TokensFinanceListModel.parse_obj(response)
 
     async def get_token_inventory(
@@ -122,7 +133,7 @@ class DexGuru:
             token_address: str,
     ) -> models.TokenInventoryModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/tokens/{token_address}/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/tokens/{token_address}/?{query}')
         return models.TokenInventoryModel.parse_obj(response)
 
     async def get_token_finance(
@@ -131,7 +142,7 @@ class DexGuru:
             token_address: str,
     ) -> models.TokenFinanceModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/tokens/{token_address}/market/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/tokens/{token_address}/market/?{query}')
         return models.TokenFinanceModel.parse_obj(response)
 
     async def get_token_transactions(
@@ -147,7 +158,7 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/tokens/{token_address}/transactions/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/tokens/{token_address}/transactions/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_token_swaps(
@@ -163,7 +174,7 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/tokens/{token_address}/transactions/swaps/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/tokens/{token_address}/transactions/swaps/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_token_burns(
@@ -178,7 +189,7 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/tokens/{token_address}/transactions/burns/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/tokens/{token_address}/transactions/burns/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_token_mints(
@@ -193,7 +204,7 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/tokens/{token_address}/transactions/mints/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/tokens/{token_address}/transactions/mints/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_token_market_history(
@@ -204,7 +215,7 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.TokensHistoryListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/tokens/{token_address}/market/history/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/tokens/{token_address}/market/history/?{query}')
         return models.TokensHistoryListModel.parse_obj(response)
 
     async def get_wallets_info(
@@ -214,7 +225,7 @@ class DexGuru:
     ) -> models.WalletsListModel:
         wallet_addresses = ','.join(wallet_addresses)
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/wallets/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/wallets/?{query}')
         return models.WalletsListModel.parse_obj(response)
 
     async def get_wallet_info(
@@ -222,7 +233,7 @@ class DexGuru:
             chain_id: int,
             wallet_address: str
     ) -> models.WalletModel:
-        response: dict = await self._client.get(f'/{chain_id}/wallets/{wallet_address}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/wallets/{wallet_address}')
         return models.WalletModel.parse_obj(response)
 
     async def get_wallet_transactions(
@@ -237,7 +248,7 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/wallets/{wallet_address}/transactions/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/wallets/{wallet_address}/transactions/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_wallet_swaps(
@@ -252,7 +263,7 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/wallets/{wallet_address}/transactions/swaps/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/wallets/{wallet_address}/transactions/swaps/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_wallet_burns(
@@ -267,7 +278,7 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/wallets/{wallet_address}/transactions/burns/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/wallets/{wallet_address}/transactions/burns/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_wallet_mints(
@@ -282,7 +293,7 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/wallets/{wallet_address}/transactions/mints/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/wallets/{wallet_address}/transactions/mints/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_amms_swaps(
@@ -300,7 +311,7 @@ class DexGuru:
         if isinstance(amms, list):
             amms = ','.join(amms)
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/amms/swaps/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/amms/swaps/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_amms_burns(
@@ -317,7 +328,7 @@ class DexGuru:
         if isinstance(amms, list):
             amms = ','.join(amms)
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/amms/burns/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/amms/burns/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_amms_mints(
@@ -334,7 +345,7 @@ class DexGuru:
         if isinstance(amms, list):
             amms = ','.join(amms)
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/amms/mints/?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/amms/mints/?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_amm_swaps(
@@ -350,7 +361,7 @@ class DexGuru:
             wallet_category: CategoriesChoices = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/amms/{amm}/swaps?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/amms/{amm}/swaps?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_amm_burns(
@@ -365,7 +376,7 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/amms/{amm}/burns?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/amms/{amm}/burns?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_amm_mints(
@@ -380,13 +391,13 @@ class DexGuru:
             end_timestamp: conint(ge=START_BLOCK_TIMESTAMP) = None,
     ) -> models.SwapsBurnsMintsListModel:
         query = get_query_from_params(**locals())
-        response: dict = await self._client.get(f'/{chain_id}/amms/{amm}/mints?{query}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/amms/{amm}/mints?{query}')
         return models.SwapsBurnsMintsListModel.parse_obj(response)
 
     async def get_all_amm_inventory(self, chain_id: int) -> models.AmmListModel:
-        response: dict = await self._client.get(f'/{chain_id}/amms')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/amms')
         return models.AmmListModel.parse_obj(response)
 
     async def get_amm_inventory(self, chain_id: int, amm: AmmChoices) -> models.AmmModel:
-        response: dict = await self._client.get(f'/{chain_id}/amms/{amm}')
+        response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/amms/{amm}')
         return models.AmmModel.parse_obj(response)

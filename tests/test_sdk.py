@@ -245,7 +245,7 @@ async def test_get_token_market_history(sdk, eth_address):
     assert txs.total != 0
     for tx in txs.data:
         assert tx.address == eth_address
-        assert isinstance(tx, models.TokenHistory)
+        assert isinstance(tx, models.TokenHistoryModel)
 
     with pytest.raises(RequestException, match='Token not found'):
         await sdk.get_token_market_history(1, ('i' * 42))
@@ -259,12 +259,6 @@ async def test_get_wallets_info(sdk, eth_wallets, polygon_wallets):
     for wallet in info.data:
         assert isinstance(wallet, models.WalletModel)
     assert len(info.data) == 4
-    info = await sdk.get_wallets_info(1, wallet_addresses=polygon_wallets)
-    assert isinstance(info, models.WalletsListModel)
-    assert len(info.data) == 2
-    for wallet in info.data:
-        assert wallet.category
-        assert wallet.volume_1m_usd is None
     with pytest.raises(RequestException, match='Wallets not found'):
         await sdk.get_wallets_info(1, wallet_addresses=['invalid'])
 

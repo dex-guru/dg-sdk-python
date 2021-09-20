@@ -1,15 +1,16 @@
 import asyncio
 import logging
 import ssl
-from typing import Union
+from typing import AnyStr, Optional
+from urllib.parse import urljoin
 
 import aiohttp
 import ujson
 from aiohttp import ClientTimeout
 from pydantic import HttpUrl
-from urllib.parse import urljoin
-from dexguru_sdk.client.exceptions import RequestException
+
 import dexguru_sdk
+from dexguru_sdk.client.exceptions import RequestException
 
 MAX_RETRY_COUNT = 10
 SSL_PROTOCOLS = (asyncio.sslproto.SSLProtocol,)
@@ -32,11 +33,11 @@ class HTTPClient:
         self.headers = {**default_headers, **headers}
         self.timeout = ClientTimeout(total=60 * 60, connect=60 * 60, sock_connect=60 * 60, sock_read=60 * 60)
         self.retries_count = 0
-        self.retry_sleep = 3
+        self.retry_sleep = 1.5
         self.domain = domain
 
-    async def get(self, url: str) -> Union[dict, None]:
-        url = urljoin(self.domain, 'v1/chain' + url)
+    async def get(self, url: AnyStr) -> Optional[dict]:
+        url = urljoin(self.domain, url)
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=self.timeout,
                                          raise_for_status=False) as session:
             logging.debug(f"Fetching {url}")
@@ -48,13 +49,22 @@ class HTTPClient:
                     if self.retries_count == MAX_RETRY_COUNT:
                         raise TimeoutError(RequestException(e))
                     await asyncio.sleep(self.retry_sleep)
-                    await self.get(url)
+                    self.retries_count += 1
+                    return await self.get(url)
                 if response.status >= 400:
+                    t = await response.text()
+                    if 'StatementError' in t:
+                        if self.retries_count == MAX_RETRY_COUNT:
+                            raise TimeoutError(RequestException('sql'))
+                        await asyncio.sleep(self.retry_sleep)
+                        self.retries_count += 1
+                        return await self.get(url)
                     e = await response.json()
                     raise RequestException(e)
                 await asyncio.sleep(0.01)
                 response_text = await response.text()
                 logging.debug(f"Fetched {url}")
+                self.retries_count = 0
                 return ujson.loads(response_text)
 
     @staticmethod
