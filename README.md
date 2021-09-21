@@ -2,7 +2,7 @@
 
 ![dexguru-logo](https://gblobscdn.gitbook.com/assets%2F-MO2nrmwh_DoxKc1v80n%2F-MTnknohxY_QQWqZ5rp-%2F-MTnm7ZgN7sBW_vNX_z1%2Fhorizontal-logo-white-background.png?alt=media&token=f6e37f23-afd5-4a13-bb6a-162e1d95d18d)
 
-dexguru-sdk.py allows you to access <a href=dex.guru>dex.guru</a> public methods
+dexguru-sdk.py allows you to access <a href=https://dex.guru>dex.guru</a> public methods
 from your async python scripts.
 
 ## Installation
@@ -13,7 +13,7 @@ To install latest version, just run:
 
 
 ## Getting Started
-Take API key of your project from <a href=dev.dex.guru>dev.dex.guru</a>
+Take API key of your project from <a href=https://dev.dex.guru>dev.dex.guru</a>
 
 
 ```python
