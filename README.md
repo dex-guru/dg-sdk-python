@@ -13,7 +13,7 @@ To install latest version, just run:
 
 
 ## Getting Started
-Take API key of your project from <a href=https://developers.dex.guru>dev.dex.guru</a>
+Take API key of your project from <a href=https://developers.dex.guru>developers.dex.guru</a>
 
 
 ```python
