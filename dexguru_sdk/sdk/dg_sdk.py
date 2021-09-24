@@ -100,14 +100,11 @@ class DexGuru:
     async def search_tokens_by_name_or_symbol(
             self,
             chain_id: int,
-            name: str = None,
-            symbol: str = None,
+            search_string: str,
             limit: conint(gt=0, le=100) = 10,
             offset: conint(ge=0) = 0,
             verified: bool = True,
     ) -> models.TokensInventoryListModel:
-        if not name and not symbol:
-            raise ValueError('Specify name or symbol for search')
         query = get_query_from_params(**locals())
         response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/tokens/?{query}')
         return models.TokensInventoryListModel.parse_obj(response)
@@ -127,7 +124,7 @@ class DexGuru:
         response: dict = await self._client.get(f'{self._chain_prefix}/{chain_id}/tokens/market/?{query}')
         return models.TokensFinanceListModel.parse_obj(response)
 
-    async def get_token_inventory(
+    async def get_token_inventory_by_address(
             self,
             chain_id: int,
             token_address: str,
