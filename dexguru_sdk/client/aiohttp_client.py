@@ -9,7 +9,7 @@ import ujson
 from aiohttp import ClientTimeout
 from pydantic import HttpUrl
 
-import dexguru_sdk
+import sdk
 from dexguru_sdk.client.exceptions import RequestException
 
 MAX_RETRY_COUNT = 10
@@ -27,7 +27,7 @@ class HTTPClient:
     def __init__(self, headers: dict, domain: HttpUrl):
         headers = headers or {}
         default_headers = {
-            'User-Agent': f"Python DexGuru SDK v{dexguru_sdk.__version__} ",
+            'User-Agent': f"Python DexGuru SDK v{sdk.__version__} ",
             "Content-Type": "application/json",
         }
         self.headers = {**default_headers, **headers}

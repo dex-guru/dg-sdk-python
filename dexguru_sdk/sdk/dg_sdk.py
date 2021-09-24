@@ -100,7 +100,7 @@ class DexGuru:
     async def search_tokens_by_name_or_symbol(
             self,
             chain_id: int,
-            search_string: str,
+            search_string: str = None,
             limit: conint(gt=0, le=100) = 10,
             offset: conint(ge=0) = 0,
             verified: bool = True,

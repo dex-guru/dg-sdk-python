@@ -2,7 +2,7 @@ from os.path import join, dirname
 
 from setuptools import setup, find_packages
 
-from dexguru_sdk import __version__
+from sdk import __version__
 
 setup(
     name='dexguru-sdk',
