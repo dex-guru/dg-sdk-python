@@ -23,7 +23,7 @@ class AmmChoices(str, Enum, metaclass=ContaineredEnum):
     quickswap = 'quickswap'
 
 
-class ChainChoices(str, Enum, metaclass=ContaineredEnum):
+class ChainChoices(int, Enum, metaclass=ContaineredEnum):
     eth = 1
     bsc = 56
     polygon = 137
