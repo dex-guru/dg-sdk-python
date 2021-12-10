@@ -21,12 +21,18 @@ class AmmChoices(str, Enum, metaclass=ContaineredEnum):
     pancakeswap = 'pancakeswap'
     sushiswap = 'sushiswap'
     quickswap = 'quickswap'
+    spiritswap = 'spiritswap'
+    spookyswap = 'spookyswap'
+    traderjoe = 'traderjoe'
+    pangolin = 'pangolin'
 
 
-class ChainChoices(str, Enum, metaclass=ContaineredEnum):
+class ChainChoices(int, Enum, metaclass=ContaineredEnum):
     eth = 1
     bsc = 56
     polygon = 137
+    fantom = 250
+    avalanche = 43114
 
 
 class TransactionChoices(str, Enum, metaclass=ContaineredEnum):
