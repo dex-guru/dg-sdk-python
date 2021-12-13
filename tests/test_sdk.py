@@ -1,4 +1,6 @@
 import pytest
+from dotenv import load_dotenv
+import os
 
 from dexguru_sdk import models
 from dexguru_sdk.client.exceptions import RequestException
@@ -6,11 +8,12 @@ from dexguru_sdk.models import choices
 from dexguru_sdk.sdk.dg_sdk import DexGuru
 
 DEFAULT_DOMAIN = 'https://api.dev.dex.guru'
+load_dotenv()
 
 
 @pytest.fixture()
 def sdk():
-    yield DexGuru(api_key='CkGWZAcDE0h5XRqR04DhtvCNofL-dfDB4WvLzKhraho',
+    yield DexGuru(api_key=os.environ.get('SDK_API_KEY'),
                   domain=DEFAULT_DOMAIN)
 
 
@@ -139,12 +142,10 @@ async def test_get_txs_mints(sdk):
 
 @pytest.mark.asyncio
 async def test_get_tokens_inventory(sdk):
-    tokens = await sdk.search_tokens_by_name_or_symbol(1, name='eth')
+    tokens = await sdk.search_tokens_by_name_or_symbol(1, search_string='eth')
     assert isinstance(tokens, models.TokensInventoryListModel)
     for token in tokens.data:
         assert isinstance(token, models.TokenInventoryModel)
-    with pytest.raises(Exception, match='Specify name'):
-        await sdk.search_tokens_by_name_or_symbol(1)
 
 
 @pytest.mark.asyncio
@@ -163,14 +164,14 @@ async def test_get_tokens_finance(sdk, btc_address, eth_address):
 
 @pytest.mark.asyncio
 async def test_get_token_inventory(sdk, eth_address):
-    token = await sdk.get_token_inventory(1, eth_address)
+    token = await sdk.get_token_inventory_by_address(1, eth_address)
     assert isinstance(token, models.TokenInventoryModel)
     assert token.address == eth_address
     with pytest.raises(RequestException, match='token_address'):
         # at least 40 symbols
-        await sdk.get_token_inventory(1, 'invalid')
+        await sdk.get_token_inventory_by_address(1, 'invalid')
     with pytest.raises(RequestException, match='Token not found'):
-        await sdk.get_token_inventory(1, eth_address + 'x')
+        await sdk.get_token_inventory_by_address(1, eth_address + 'x')
 
 
 @pytest.mark.asyncio
@@ -180,9 +181,9 @@ async def test_get_token_finance(sdk, eth_address):
     assert token.address == eth_address
     with pytest.raises(RequestException, match='token_address'):
         # at least 40 symbols
-        await sdk.get_token_inventory(1, 'invalid')
-    with pytest.raises(RequestException, match='Token not found'):
-        await sdk.get_token_inventory(1, eth_address + 'x')
+        await sdk.get_token_finance(1, 'invalid')
+    with pytest.raises(RequestException, match='Not found token finance'):
+        await sdk.get_token_finance(1, eth_address + 'x')
 
 
 @pytest.mark.asyncio
