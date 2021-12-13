@@ -20,7 +20,7 @@ class SwapBurnMintModel(BaseModel):
     tokens_out: List[dict]
     pair_address: str
     wallet_address: str
-    wallet_category: constr(to_lower=True)
+    wallet_category: Optional[constr(to_lower=True)] = None
     transaction_type: TransactionChoices
 
     class SortFields(Enum):
