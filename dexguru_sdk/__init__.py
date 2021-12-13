@@ -8,6 +8,7 @@ __all__ = [
     'AmmListModel',
     'ChainModel',
     'ChainsListModel',
+    'DexGuru',
     'TokenFinanceModel',
     'TokensFinanceListModel',
     'TokenHistoryModel',
