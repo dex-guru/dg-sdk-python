@@ -16,15 +16,20 @@ class ContaineredEnum(EnumMeta):
 
 
 class AmmChoices(str, Enum, metaclass=ContaineredEnum):
+    all = 'all'
     uniswap_v3 = 'uniswap_v3'
     uniswap = 'uniswap'
+    uniswap_v2 = 'uniswap_v2'
     pancakeswap = 'pancakeswap'
     sushiswap = 'sushiswap'
     quickswap = 'quickswap'
-    spiritswap = 'spiritswap'
-    spookyswap = 'spookyswap'
-    traderjoe = 'traderjoe'
     pangolin = 'pangolin'
+    traderjoe = 'traderjoe'
+    ubeswap = 'ubeswap'
+    spookyswap = 'spookyswap'
+    spiritswap = 'spiritswap'
+    kyber = 'kyber'
+    lydia = 'lydia'
 
 
 class ChainChoices(int, Enum, metaclass=ContaineredEnum):
@@ -33,6 +38,8 @@ class ChainChoices(int, Enum, metaclass=ContaineredEnum):
     polygon = 137
     fantom = 250
     avalanche = 43114
+    arbitrum = 42161
+    celo = 42220
 
 
 class TransactionChoices(str, Enum, metaclass=ContaineredEnum):
