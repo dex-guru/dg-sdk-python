@@ -248,7 +248,7 @@ async def test_get_token_market_history(sdk, eth_address):
         assert tx.address == eth_address
         assert isinstance(tx, models.TokenHistoryModel)
 
-    with pytest.raises(RequestException, match='Token not found'):
+    with pytest.raises(RequestException, match='Token history not found'):
         await sdk.get_token_market_history(1, ('i' * 42))
 
 
