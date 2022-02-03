@@ -7,8 +7,8 @@ from dexguru_sdk.models.choices import TransactionChoices, ChainChoices, TokenTr
 
 
 class SwapBurnMintModel(BaseModel):
-    amm: AmmChoices
-    chain_id: ChainChoices
+    amm: str
+    chain_id: int
     direction: Optional[TokenTradeDirections]
     transaction_address: str
     timestamp: int

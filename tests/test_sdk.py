@@ -132,7 +132,7 @@ async def test_get_txs_mints(sdk):
         limit=1,
         offset=2,
         begin_timestamp=1630934916,
-        end_timestamp=1631021316,
+        end_timestamp=1643867897,
     )
     assert isinstance(txs, models.SwapsBurnsMintsListModel)
     assert len(txs.data) == 1
@@ -301,25 +301,25 @@ async def test_get_wallet_swaps(sdk, eth_wallets):
 
 @pytest.mark.asyncio
 async def test_get_wallet_burns(sdk):
-    txs = await sdk.get_wallet_burns(1, wallet_address='0x935d2fd458fdf41b6f7b62471f593797866a3ce6', limit=6)
+    txs = await sdk.get_wallet_burns(1, wallet_address='0x18c8303797168dbfe5e085222c6de2f23e9e3979', limit=6)
     assert isinstance(txs, models.SwapsBurnsMintsListModel)
     assert txs.total > 0
     assert 0 < len(txs.data) <= 6
     for tx in txs.data:
         assert isinstance(tx, models.SwapBurnMintModel)
-        assert tx.wallet_address == '0x935d2fd458fdf41b6f7b62471f593797866a3ce6'
+        assert tx.wallet_address == '0x18c8303797168dbfe5e085222c6de2f23e9e3979'
         assert tx.transaction_type == choices.TransactionChoices.burn
 
 
 @pytest.mark.asyncio
 async def test_get_wallet_mints(sdk):
-    txs = await sdk.get_wallet_mints(1, wallet_address='0x935d2fd458fdf41b6f7b62471f593797866a3ce6', limit=5)
+    txs = await sdk.get_wallet_mints(1, wallet_address='0xf75e60ffa4c600cbfaf7ab694663fa9ffef0f59a', limit=5)
     assert isinstance(txs, models.SwapsBurnsMintsListModel)
     assert txs.total > 0
     assert 0 < len(txs.data) <= 5
     for tx in txs.data:
         assert isinstance(tx, models.SwapBurnMintModel)
-        assert tx.wallet_address == '0x935d2fd458fdf41b6f7b62471f593797866a3ce6'
+        assert tx.wallet_address == '0xf75e60ffa4c600cbfaf7ab694663fa9ffef0f59a'
         assert tx.transaction_type == choices.TransactionChoices.mint
 
 
