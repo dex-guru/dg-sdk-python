@@ -115,6 +115,7 @@ class DexGuru:
             token_addresses: List[str] = None,
             verified: bool = None,
             sort_by: str = None,
+            order: str = None,
             limit: conint(gt=0, le=100) = 10,
             offset: conint(ge=0) = 0,
     ) -> models.TokensFinanceListModel:
