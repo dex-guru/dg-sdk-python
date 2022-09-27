@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class TokenInventoryModel(BaseModel):
+    chain_id: int
     address: str
     name: str
     symbol: str
@@ -16,6 +17,7 @@ class TokensInventoryListModel(BaseModel):
 
 
 class TokenFinanceModel(BaseModel):
+    chain_id: int
     address: str
     volume_24h: float
     liquidity: float
@@ -37,6 +39,7 @@ class TokensFinanceListModel(BaseModel):
 
 
 class TokenHistoryModel(BaseModel):
+    chain_id: int
     address: str
     volume_24h: float = Field(alias='volume24h_eth')
     liquidity: float
