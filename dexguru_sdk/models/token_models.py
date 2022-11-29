@@ -24,6 +24,7 @@ class TokenFinanceModel(BaseModel):
     volume_24h_usd: float
     liquidity_usd: float
     price_usd: float
+    price_eth: float = None
     volume_24h_delta: float
     liquidity_24h_delta: float
     price_24h_delta: float
