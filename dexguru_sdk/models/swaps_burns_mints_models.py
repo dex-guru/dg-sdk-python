@@ -13,7 +13,7 @@ class SwapBurnMintModel(BaseModel):
     transaction_address: str
     timestamp: int
     block_number: int
-    to: Optional[str]
+    to: Optional[str] = None
     sender: Optional[str] = None
     amount_usd: float
     tokens_in: List[dict]
