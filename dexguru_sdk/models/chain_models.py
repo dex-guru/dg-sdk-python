@@ -10,6 +10,7 @@ class ChainModel(BaseModel):
     name: str
     description: str
     native_token: TokenInventoryModel
+    eip1559: bool
 
 
 class ChainsListModel(BaseModel):
