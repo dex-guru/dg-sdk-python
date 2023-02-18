@@ -23,6 +23,11 @@ jobs:
       run: pip install -r requirements.txt
       shell: sh
 
+    - name: Install dev requirements
+      run: pip install -r requirements_dev.txt
+      shell: sh
+
+
     - name: Run tests
       run: python ${{ env.DIR }}/test_sdk.py
       shell: sh
