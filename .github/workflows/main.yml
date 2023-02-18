@@ -19,7 +19,10 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Run tests
+    - name: Install requirements
       run: pip install -r requirements.txt
-           python ${{ env.DIR }}/test_sdk.py
+      shell: sh
+
+    - name: Run tests
+      run: python ${{ env.DIR }}/test_sdk.py
       shell: sh
