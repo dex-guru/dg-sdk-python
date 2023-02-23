@@ -34,13 +34,16 @@ class AmmChoices(str, Enum, metaclass=ContaineredEnum):
 
 class ChainChoices(int, Enum, metaclass=ContaineredEnum):
     eth = 1
+    optimism = 10
     bsc = 56
+    gnosis = 100
     polygon = 137
     fantom = 250
-    avalanche = 43114
     arbitrum = 42161
     celo = 42220
-
+    avalanche = 43114
+    nova = 42170
+    canto = 7700
 
 class TransactionChoices(str, Enum, metaclass=ContaineredEnum):
     swap = 'swap'
