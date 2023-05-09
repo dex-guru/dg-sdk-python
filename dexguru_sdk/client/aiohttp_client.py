@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import ssl
 from typing import AnyStr, Optional
 from urllib.parse import urljoin
@@ -27,8 +28,9 @@ class HTTPClient:
     def __init__(self, headers: dict, domain: HttpUrl):
         headers = headers or {}
         default_headers = {
-            'User-Agent': f"Python DexGuru SDK v{sdk.__version__} ",
+            "User-Agent": f"Python DexGuru SDK v{sdk.__version__} ",
             "Content-Type": "application/json",
+            "x-sys-key": os.environ.get('X_SYS_KEY', 'system'),
         }
         self.headers = {**default_headers, **headers}
         self.timeout = ClientTimeout(total=60 * 60, connect=60 * 60, sock_connect=60 * 60, sock_read=60 * 60)
