@@ -1,0 +1,28 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check-out repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Install requirements
+      run: pip install -r requirements.txt
+      shell: sh
+
+    - name: Install dev requirements
+      run: pip install -r requirements_dev.txt
+      shell: sh
+
+
+    - name: Run tests
+      run: python tests/test_sdk.py
+      shell: sh
